@@ -1,6 +1,35 @@
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function ReceivePreview() {
+  const location = useLocation();
+  const { usd, zar, rate } = location.state || {};
+  const navigate = useNavigate();
+
+  //  Redirecting if user came here without data
+  useEffect(() => {
+    if (usd === undefined || zar === undefined || rate === undefined) {
+      navigate("/");
+    }
+  }, [navigate, usd, zar, rate]);
+
+  //  Format USD
+  const formatUSD = (value: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 2,
+    }).format(value);
+
+  //  Format ZAR
+  const formatZAR = (value: number) =>
+    new Intl.NumberFormat("en-ZA", {
+      style: "currency",
+      currency: "ZAR",
+      maximumFractionDigits: 2,
+    }).format(value);
+
   return (
     <div className="flex items-center justify-center pt-20">
       <div className="bg-blue-400 p-6 rounded-xl w-full max-w-md shadow-xl">
@@ -8,16 +37,20 @@ export default function ReceivePreview() {
           Receiver Preview
         </h1>
 
-        <p className="text-amber-50 mb-4">
-          This is where the receiver's details and payout preview will appear.
-        </p>
+        <div className="text-white bg-blue-950 p-3 rounded-xl text-center">
+          <p className="mb-3">Amount Sent: {formatUSD(usd)}</p>
+          <p className="mb-3">Amount Received: {formatZAR(zar)}</p>
+          <p className="mb-3">Rate Used: 1 USD = {rate} ZAR</p>
+          <p className="mb-3">Time: {new Date().toLocaleString()}</p>
+        </div>
 
-        <Link
-          to="/"
-          className="block text-center mt-6 bg-white hover:bg-blue-200 transition p-3 rounded-lg font-medium text-blue"
+        <button
+          
+          onClick={() => navigate(-1)}
+          className="block text-center mt-6 w-2xs bg-white hover:bg-blue-200 transition p-3 rounded-lg font-medium text-blue"
         >
           Back
-        </Link>
+        </button>
       </div>
     </div>
   );

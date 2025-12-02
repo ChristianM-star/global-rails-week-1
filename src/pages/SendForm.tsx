@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function SendForm() {
   // Store raw string exactly as the user types
@@ -22,7 +23,7 @@ export default function SendForm() {
   const formatZAR = (value: number) =>
     new Intl.NumberFormat("en-ZA", {
       style: "currency",
-      currency: "ZAR",
+      currency: "ZAR", 
       maximumFractionDigits: 2,
     }).format(value);
 
@@ -93,11 +94,32 @@ export default function SendForm() {
         <button
           disabled={!isValid}
           onClick={() => {
+
+            if(!isValid) return;
+
+            //?1, this is the transaction object 
+            const newTransaction = {
+              id: crypto.randomUUID(),
+              usd:amountNumber,
+              zar: converted,
+              rate: rate,
+              timestamp: Date.now(),
+            }
+
+            //? Load old transactions 
+            const existing = JSON.parse(localStorage.getItem("transactions") || "[]");
+            //? Add new one 
+            const updated = [...existing, newTransaction];
+            //? save them back
+            localStorage.setItem("transactions", JSON.stringify(updated));
+
+            //? Navigate with state 
             navigate("/receive", {
               state: {
                 usd: amountNumber,
                 zar: converted,
                 rate: rate,
+                timestamp: newTransaction.timestamp,
               },
             });
           }}
@@ -111,6 +133,9 @@ export default function SendForm() {
         >
           Continue
         </button>
+            <Link to="/history" className="text-blue-300 underline">
+  View History
+</Link>
       </div>
     </div>
   );

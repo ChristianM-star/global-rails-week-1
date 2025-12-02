@@ -4,17 +4,18 @@ import { useEffect } from "react";
 
 export default function ReceivePreview() {
   const location = useLocation();
-  const { usd, zar, rate } = location.state || {};
+  //? get the state object or any empty object if no state was passed
+  const { usd, zar, rate, timestamp } = location.state || {};
   const navigate = useNavigate();
 
-  //  Redirecting if user came here without data
+  //!  Redirecting if user came here without data
   useEffect(() => {
     if (usd === undefined || zar === undefined || rate === undefined) {
       navigate("/");
     }
   }, [navigate, usd, zar, rate]);
 
-  //  Format USD
+  // ? Format USD
   const formatUSD = (value: number) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -22,7 +23,7 @@ export default function ReceivePreview() {
       maximumFractionDigits: 2,
     }).format(value);
 
-  //  Format ZAR
+  //?  Format ZAR
   const formatZAR = (value: number) =>
     new Intl.NumberFormat("en-ZA", {
       style: "currency",
@@ -41,7 +42,9 @@ export default function ReceivePreview() {
           <p className="mb-3">Amount Sent: {formatUSD(usd)}</p>
           <p className="mb-3">Amount Received: {formatZAR(zar)}</p>
           <p className="mb-3">Rate Used: 1 USD = {rate} ZAR</p>
-          <p className="mb-3">Time: {new Date().toLocaleString()}</p>
+          <p className="p-2" >
+            Time: {timestamp? new Date(timestamp).toLocaleString(): "N/A"}
+          </p>
         </div>
 
         <button
